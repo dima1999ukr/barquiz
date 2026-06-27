@@ -1,53 +1,48 @@
-const CACHE_NAME = 'barquiz-v' + new Date().getTime(); // Jedes Mal ein komplett neuer Cache-Name!
+const CACHE_NAME = 'barquiz-v1.1.0';
 const ASSETS = [
   'index.html',
   'manifest.json',
   'icon.svg'
 ];
 
-// Install: Alle Assets in den Cache laden
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((c) => c.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
-  self.skipWaiting(); // Neue Version sofort aktivieren
+  self.skipWaiting();
 });
 
-// Aktivieren: Alte Caches löschen
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+    })
   );
   self.clients.claim();
 });
 
-// Fetch: Cache-first bei Assets, sonst Netz -> Cache
 self.addEventListener('fetch', (e) => {
-  // Nur GET-Anfragen cachen
   if (e.request.method !== 'GET') return;
 
-  // Nur eigene App-Seiten cachen (gleicher Origin)
-  const url = new URL(e.request.url);
-
+  // Network-First Strategie: Erst das Netz fragen, falls offline -> Cache.
+  // Das verhindert, dass wir jemals in einer alten Version "gefangen" sind!
   e.respondWith(
-    caches.match(e.request).then((cached) => {
-      if (cached) return cached; // Aus Cache servieren
-
-      return fetch(e.request).then((res) => {
-        // Nur gültige Antworten cachen
-        if (!res || res.status !== 200 || res.type !== 'basic') return res;
-
-        // Response klonen (kann nur einmal gelesen werden)
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then((c) => c.put(e.request, clone));
-        return res;
-      }).catch(() => {
-        // Netz nicht verfügbar — falls verfügbar, Fallback-Seite zeigen
-        // Bei index.html haben wir die schon im Cache
-        return caches.match('index.html');
-      });
-    })
+    fetch(e.request)
+      .then((response) => {
+        if (response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+        }
+        return response;
+      })
+      .catch(() => {
+        return caches.match(e.request);
+      })
   );
 });

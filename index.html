@@ -309,7 +309,7 @@
 <body>
 
 <header>
-  <h1>🍺 BarQuiz</h1>
+  <h1>🍺 BarQuiz <span style="font-size: 0.8rem; vertical-align: middle; opacity: 0.5;">v1.1.0</span></h1>
   <div class="sub">Schätzfragen für die Runde</div>
   <div class="score-row">
     <span>Richtig: <strong id="score-right">0</strong></span>
@@ -606,16 +606,20 @@ document.getElementById('install-close').addEventListener('click', () => {
 // SERVICE WORKER (PWA OFFLINE + SOFORT-UPDATE CHECK)
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then((reg) => {
-    // Falls ein Update gefunden wird, Seite automatisch neu laden!
-    reg.addEventListener('updatefound', () => {
-      const newWorker = reg.installing;
-      newWorker.addEventListener('statechange', () => {
-        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          showToast('🔄 Update wird geladen...');
-          setTimeout(() => window.location.reload(), 1000);
+    // Falls ein Update im Hintergrund geladen wurde, dem User signalisieren
+    reg.onupdatefound = () => {
+      const installingWorker = reg.installing;
+      installingWorker.onstatechange = () => {
+        if (installingWorker.state === 'installed') {
+          if (navigator.serviceWorker.controller) {
+            showToast('🔄 Neue Version geladen! Starte neu...');
+            setTimeout(() => {
+              window.location.reload(true);
+            }, 1500);
+          }
         }
-      });
-    });
+      };
+    };
   });
 }
 
