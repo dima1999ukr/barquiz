@@ -1,4 +1,4 @@
-const CACHE_NAME = 'barquiz-v1.1.0';
+const CACHE_NAME = 'barquiz-v1.2.0';
 const ASSETS = [
   'index.html',
   'manifest.json',
@@ -30,8 +30,6 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
 
-  // Network-First Strategie: Erst das Netz fragen, falls offline -> Cache.
-  // Das verhindert, dass wir jemals in einer alten Version "gefangen" sind!
   e.respondWith(
     fetch(e.request)
       .then((response) => {
