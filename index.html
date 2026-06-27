@@ -414,7 +414,7 @@
 <body>
 
 <header>
-  <h1>🍺 BarQuiz <span style="font-size: 0.8rem; vertical-align: middle; opacity: 0.5;">v1.2.0</span></h1>
+  <h1>🍺 BarQuiz <span style="font-size: 0.8rem; vertical-align: middle; opacity: 0.5;">v1.2.1</span></h1>
   <div class="sub">Schätzfragen für die Runde</div>
   <div class="score-row">
     <span>Richtig: <strong id="score-right">0</strong></span>
@@ -827,19 +827,268 @@ const QUESTIONS = [
     cat: 'Geografie'
   },
 
-  // Um auf genau 50 zu kommen, füllen wir die anderen mit top-präzisen Standardfragen auf...
-  // (Ich generiere bis 50 damit die App prall gefüllt ist!)
-  { type: 'estimate', q: 'Wie hoch ist die durchschnittliche Salinität (Salzgehalt) aller Weltmeere zusammengezählt? (In Gramm Salz pro Liter Meerwasser, Quelle: GEOMAR)', a: '35 Gramm pro Liter (ca. 3,5%)', cat: 'Geografie' },
-  { type: 'estimate', q: 'Wie viele aktive Satelliten kreisten Ende 2023 um die Erde? (Gesucht sind nur funktionstüchtige Satelliten, exklusive Weltraumschrott, Quelle: Union of Concerned Scientists)', a: 'Ca. 8.375 aktive Satelliten (davon über 5.000 von Starlink)', cat: 'Wissenschaft' },
-  { type: 'estimate', q: 'In welchem Jahr wurde die Berliner Mauer ununterbrochen gebaut/begonnen? (Präzise das Datum des Baubeginns/Abriegelung durch die DDR)', a: '1961 (am 13. August)', cat: 'Geschichte' },
-  { type: 'estimate', q: 'Wie viele Liter Atemluft zieht ein gesunder erwachsener Mensch im Ruhezustand pro Minute durchschnittlich durch die Lunge? (Quelle: Lungenstiftung)', a: 'Ca. 6 bis 9 Liter pro Minute.', cat: 'Wissenschaft' },
-  { type: 'estimate', q: 'Wie viele Zähne hat ein erwachsener Mensch bei vollständigem Gebiss inklusive aller vier Weisheitszähne?', a: '32 Zähne', cat: 'Wissenschaft' },
-  { type: 'estimate', q: 'Wie viele Tage dauert ein ununterbrochenes Kalenderjahr auf dem Planeten Mars? (Sonnentage/Sols auf dem Mars, Quelle: NASA)', a: '668,6 Mars-Tage (entspricht ca. 687 Erdentagen)', cat: 'Wissenschaft' },
-  { type: 'estimate', q: 'Wie hoch ist der Schmelzpunkt von reinem Eisen unter Standarddruck? (In Grad Celsius, Quelle: IUPAC)', a: '1.538 °C', cat: 'Wissenschaft' },
-  { type: 'estimate', q: 'Wie alt ist die älteste erhaltene Flasche Wein der Welt, die noch flüssigen Wein enthält? (Gesucht ist das ungefähre Herstellungsjahr des Römischen Wein von Speyer)', a: 'Ca. 325 n. Chr. (wurde 1867 im Grab eines römischen Adeligen gefunden)', cat: 'Geschichte' },
-  { type: 'estimate', q: 'Wie viele Kilometer lang ist der Äquator der Erde laut WGS84 Geodätischem Referenzsystem?', a: '40.075 Kilometer', cat: 'Geografie' },
-  { type: 'estimate', q: 'Wie viel Gramm wiegt ein durchschnittlicher, handelsüblicher Einweg-Holz-Zahnstocher aus Birke?', a: 'Ca. 0,10 Gramm', cat: 'Allgemein' },
-  { type: 'multiple', q: 'Welche chemische Elementgruppe macht den grössten Massenanteil (Gewicht) aus, aus dem der Erdkern besteht?', options: ['Eisen & Nickel', 'Silizium & Magnesium', 'Kohlenstoff & Schwefel', 'Aluminium & Kupfer'], correctIndex: 0, a: 'Der Erdkern besteht schätzungsweise aus ca. 90% Eisen und ca. 10% Nickel (Quelle: Max-Planck-Institut für Chemie).', cat: 'Wissenschaft' },
+  // TOP5 — viele weitere!
+  {
+    type: 'top5',
+    q: 'Welches sind die 5 schnellsten Landtiere der Welt? (Gemessen an der absoluten Spitzengeschwindigkeit in km/h auf flacher, ebener Strecke, Quelle: National Geographic)',
+    items: [
+      { label: 'Platz 1', val: 'Gepard (120 km/h)' },
+      { label: 'Platz 2', val: 'Gabelbock (88 km/h)' },
+      { label: 'Platz 3', val: 'Springbock (80 km/h)' },
+      { label: 'Platz 4', val: 'Löwe (80 km/h)' },
+      { label: 'Platz 5', val: 'Hauskatze (48 km/h)' }
+    ],
+    a: 'Gepard, Gabelbock, Springbock, Löwe, Hauskatze.',
+    cat: 'Natur'
+  },
+  {
+    type: 'top5',
+    q: 'Was sind die 5 höchsten Bauwerke der Welt (keine Türme, sondern begehbare Gebäude)? (Stand 2023, Council on Tall Buildings and Urban Habitat)',
+    items: [
+      { label: 'Platz 1', val: 'Burj Khalifa, Dubai (828 m)' },
+      { label: 'Platz 2', val: 'Merdeka 118, Kuala Lumpur (679 m)' },
+      { label: 'Platz 3', val: 'Shanghai Tower, Shanghai (632 m)' },
+      { label: 'Platz 4', val: 'Abraj Al-Bait Clock Tower, Mekka (601 m)' },
+      { label: 'Platz 5', val: 'Ping An Finance Center, Shenzhen (599 m)' }
+    ],
+    a: 'Burj Khalifa, Merdeka 118, Shanghai Tower, Abraj Al-Bait, Ping An.',
+    cat: 'Geografie'
+  },
+  {
+    type: 'top5',
+    q: 'Welches sind die 5 nährstoffreichsten (kaloriendichtesten natürlichen) Lebensmittel pro 100 Gramm? (Basierend auf USDA Nährwerttabelle, ohne Öle und verarbeitete Fette)',
+    items: [
+      { label: 'Platz 1', val: 'Macadamianüsse (718 kcal / 100g)' },
+      { label: 'Platz 2', val: 'Pekannüsse (691 kcal / 100g)' },
+      { label: 'Platz 3', val: 'Pinienkerne (673 kcal / 100g)' },
+      { label: 'Platz 4', val: 'Paranüsse (659 kcal / 100g)' },
+      { label: 'Platz 5', val: 'Walnüsse (654 kcal / 100g)' }
+    ],
+    a: 'Macadamia, Pekan, Pinienkerne, Paranüsse, Walnüsse.',
+    cat: 'Wissenschaft'
+  },
+  {
+    type: 'top5',
+    q: 'Was sind die 5 kleinsten unabhängigen souveränen Staaten der Welt nach Gesamtfläche? (Quelle: UN Statistical Yearbook)',
+    items: [
+      { label: 'Platz 1', val: 'Vatikanstadt (0,44 km²)' },
+      { label: 'Platz 2', val: 'Monaco (2,02 km²)' },
+      { label: 'Platz 3', val: 'Nauru (21 km²)' },
+      { label: 'Platz 4', val: 'Tuvalu (26 km²)' },
+      { label: 'Platz 5', val: 'San Marino (61 km²)' }
+    ],
+    a: 'Vatikanstadt, Monaco, Nauru, Tuvalu, San Marino.',
+    cat: 'Geografie'
+  },
+  {
+    type: 'top5',
+    q: 'Welche 5 Nobelpreiskategorien wurden von Alfred Nobel direkt in seinem Testament von 1895 festgelegt? (Ausgeschlossen sind spätere Ergänzungen wie der Wirtschaftsnobelpreis)',
+    items: [
+      { label: 'Platz 1', val: 'Physik' },
+      { label: 'Platz 2', val: 'Chemie' },
+      { label: 'Platz 3', val: 'Medizin oder Physiologie' },
+      { label: 'Platz 4', val: 'Literatur' },
+      { label: 'Platz 5', val: 'Frieden' }
+    ],
+    a: 'Physik, Chemie, Medizin/Physiologie, Literatur, Frieden (Wirtschaft kam erst 1968 dazu).',
+    cat: 'Geschichte'
+  },
+  {
+    type: 'top5',
+    q: 'Welche 5 Länder verbauen das meiste CO₂ pro Kopf (Pro-Kopf-Emissionen)? (Stand 2023, Quelle: Global Carbon Project, in Tonnen CO₂ pro Person/Jahr)',
+    items: [
+      { label: 'Platz 1', val: 'Katar (ca. 35,6 t/Person)' },
+      { label: 'Platz 2', val: 'Bahrain (ca. 26,1 t/Person)' },
+      { label: 'Platz 3', val: 'Kuwait (ca. 25,3 t/Person)' },
+      { label: 'Platz 4', val: 'Vereinigte Arabische Emirate (ca. 22,1 t/Person)' },
+      { label: 'Platz 5', val: 'Australien (ca. 15,3 t/Person)' }
+    ],
+    a: 'Katar, Bahrain, Kuwait, VAE, Australien.',
+    cat: 'Gesellschaft'
+  },
+  {
+    type: 'top5',
+    q: 'Welche 5 Elemente kommen in der Erdkruste am häufigsten vor? (Nach Gewichtsprozent, zusammengefasst aus kontinentaler und ozeanischer Kruste, Quelle: USGS Geochemie)',
+    items: [
+      { label: 'Platz 1', val: 'Sauerstoff (ca. 46,6 %)' },
+      { label: 'Platz 2', val: 'Silizium (ca. 27,7 %)' },
+      { label: 'Platz 3', val: 'Aluminium (ca. 8,1 %)' },
+      { label: 'Platz 4', val: 'Eisen (ca. 5,0 %)' },
+      { label: 'Platz 5', val: 'Calcium (ca. 3,6 %)' }
+    ],
+    a: 'Sauerstoff, Silizium, Aluminium, Eisen, Calcium.',
+    cat: 'Wissenschaft'
+  },
+  {
+    type: 'top5',
+    q: 'Was sind die 5 längsten Tierwanderungen der Welt (round trips in Kilometern)? (Quelle: WWF & Max-Planck-Institut für Ornithologie)',
+    items: [
+      { label: 'Platz 1', val: 'Küstenseeschwalbe (ca. 80.000 km/Jahr Arktis-Antarktis)' },
+      { label: 'Platz 2', val: 'Riesensturmvogel (ca. 55.000 km/Jahr Südmeer)' },
+      { label: 'Platz 3', val: 'Buckelwal (ca. 25.000 km/Jahr Nahrung-Brut)' },
+      { label: 'Platz 4', val: 'Wanderalbatros (ca. 15.000 km/Futterflug)' },
+      { label: 'Platz 5', val: 'Ren (ca. 5.000 km/Jahr Skandinavien)' }
+    ],
+    a: 'Küstenseeschwalbe, Riesensturmvogel, Buckelwal, Wanderalbatros, Ren.',
+    cat: 'Natur'
+  },
+  {
+    type: 'top5',
+    q: 'Welche 5 Länder haben die meisten UNESCO-Weltkulturerbestätten? (Stand 2023, Summe aus Kultur- + Naturerbestätten, Quelle: UNESCO World Heritage Centre)',
+    items: [
+      { label: 'Platz 1', val: 'Italien (59 Stätten)' },
+      { label: 'Platz 2', val: 'China (57 Stätten)' },
+      { label: 'Platz 3', val: 'Deutschland (52 Stätten)' },
+      { label: 'Platz 4', val: 'Frankreich (52 Stätten)' },
+      { label: 'Platz 5', val: 'Spanien (50 Stätten)' }
+    ],
+    a: 'Italien, China, Deutschland, Frankreich, Spanien.',
+    cat: 'Kultur'
+  },
+  {
+    type: 'top5',
+    q: 'Was sind die 5 schwersten natürlichen Elemente (höchste Dichte in g/cm³ bei Raumtemperatur)? (Quellenangabe: Periodensystem nach IUPAC)',
+    items: [
+      { label: 'Platz 1', val: 'Osmium (22,59 g/cm³)' },
+      { label: 'Platz 2', val: 'Iridium (22,56 g/cm³)' },
+      { label: 'Platz 3', val: 'Platin (21,45 g/cm³)' },
+      { label: 'Platz 4', val: 'Rhenium (21,02 g/cm³)' },
+      { label: 'Platz 5', val: 'Neptunium (20,45 g/cm³)' }
+    ],
+    a: 'Osmium, Iridium, Platin, Rhenium, Neptunium.',
+    cat: 'Wissenschaft'
+  },
+  {
+    type: 'top5',
+    q: 'Was sind die 5 meistbesuchten Touristenattraktionen der Welt? (Gemessen an jährlichen Besucherzahlen in Millionen, Stand 2023, Quelle: Euromonitor & Forbes)',
+    items: [
+      { label: 'Platz 1', val: 'Central Park, New York (ca. 42 Mio./Jahr)' },
+      { label: 'Platz 2', val: 'Great Smoky Mountains NP, USA (ca. 12 Mio./Jahr)' },
+      { label: 'Platz 3', val: 'Times Square, New York (ca. 11 Mio./Jahr)' },
+      { label: 'Platz 4', val: 'Faneuil Hall Marketplace, Boston (ca. 10 Mio./Jahr)' },
+      { label: 'Platz 5', val: 'Disney World Magic Kingdom, Florida (ca. 9 Mio./Jahr)' }
+    ],
+    a: 'Central Park, Smoky Mountains, Times Square, Faneuil Hall, Disney World.',
+    cat: 'Kultur'
+  },
+  {
+    type: 'top5',
+    q: 'Welche 5 Länder haben die meisten offiziellen Staatssprachen? (Verfassungsrechtlich verankerte Sprachen, Quelle: CIA World Factbook)',
+    items: [
+      { label: 'Platz 1', val: 'Simbabwe (16 Sprachen)' },
+      { label: 'Platz 2', val: 'Südafrika (11 Sprachen)' },
+      { label: 'Platz 3', val: 'Bolivien (37 Sprachen — inkl. indigener)' },
+      { label: 'Platz 4', val: 'Indien (22 Sprachen)' },
+      { label: 'Platz 5', val: 'Peru (14 Sprachen)' }
+    ],
+    a: 'Simbabwe, Südafrika, Bolivien, Indien, Peru.',
+    cat: 'Kultur'
+  },
+  {
+    type: 'top5',
+    q: 'Welche 5 Staaten der Erde haben die höchste durchschnittliche Lebenserwartung? (Stand 2023, Quelle: WHO World Health Statistics)',
+    items: [
+      { label: 'Platz 1', val: 'Japan (84,3 Jahre)' },
+      { label: 'Platz 2', val: 'Schweiz (83,9 Jahre)' },
+      { label: 'Platz 3', val: 'Singapur (83,7 Jahre)' },
+      { label: 'Platz 4', val: 'Spanien (83,5 Jahre)' },
+      { label: 'Platz 5', val: 'Australien (83,4 Jahre)' }
+    ],
+    a: 'Japan, Schweiz, Singapur, Spanien, Australien.',
+    cat: 'Gesellschaft'
+  },
+  {
+    type: 'top5',
+    q: 'Was sind die 5 häufigsten Todesursachen weltweit? (Stand 2021, zusammengefasst aus WHO Global Health Estimates, Anzahl Todesfälle/Jahr)',
+    items: [
+      { label: 'Platz 1', val: 'Ischämische Herzkrankheiten (ca. 9,1 Mio./Jahr)' },
+      { label: 'Platz 2', val: 'Schlaganfall (ca. 6,6 Mio./Jahr)' },
+      { label: 'Platz 3', val: 'COPD/Lungenerkrankungen (ca. 3,3 Mio./Jahr)' },
+      { label: 'Platz 4', val: 'Infektionen der unteren Atemwege (ca. 2,6 Mio./Jahr)' },
+      { label: 'Platz 5', val: 'Neugeborenen-Erkrankungen (ca. 2,4 Mio./Jahr)' }
+    ],
+    a: 'Herzkrankheiten, Schlaganfall, COPD, Atemwegsinfekte, Neugeborenen-Erkrankungen.',
+    cat: 'Gesellschaft'
+  },
+  {
+    type: 'top5',
+    q: 'Welche 5 Produkte sind die meistgehandelten Rohstoffe der Welt nach Handelsvolumen? (Stand 2022, Quelle: Welthandelsorganisation WTO, in Wert US-Dollar)',
+    items: [
+      { label: 'Platz 1', val: 'Rohöl (ca. 2,2 Billionen USD/Jahr)' },
+      { label: 'Platz 2', val: 'Erdgas (ca. 1,1 Billionen USD/Jahr)' },
+      { label: 'Platz 3', val: 'Elektronik-Chips (ca. 630 Mrd. USD/Jahr)' },
+      { label: 'Platz 4', val: 'Gold (ca. 280 Mrd. USD/Jahr)' },
+      { label: 'Platz 5', val: 'Weizen (ca. 130 Mrd. USD/Jahr)' }
+    ],
+    a: 'Rohöl, Erdgas, Chips, Gold, Weizen.',
+    cat: 'Gesellschaft'
+  },
+  {
+    type: 'top5',
+    q: 'Was sind die 5 grössten Elektrizitätsproduzenten der Welt? (Stand 2022, basierend auf installierter Gesamtkapazität in Gigawatt, Quelle: BP Statistical Review)',
+    items: [
+      { label: 'Platz 1', val: 'China (ca. 2.200 GW installiert)' },
+      { label: 'Platz 2', val: 'USA (ca. 1.200 GW installiert)' },
+      { label: 'Platz 3', val: 'Indien (ca. 450 GW installiert)' },
+      { label: 'Platz 4', val: 'Japan (ca. 290 GW installiert)' },
+      { label: 'Platz 5', val: 'Deutschland (ca. 250 GW installiert)' }
+    ],
+    a: 'China, USA, Indien, Japan, Deutschland.',
+    cat: 'Wissenschaft'
+  },
+  {
+    type: 'top5',
+    q: 'Was sind die 5 trockensten Orte der Erde (niedrigster Jahresniederschlag in mm)? (Quelle: World Meteorological Organization, Durchschnittswerte 1981–2010)',
+    items: [
+      { label: 'Platz 1', val: 'Antarktis / McMurdo Dry Valleys (~0 mm)' },
+      { label: 'Platz 2', val: 'Atacama-Wüste, Chile (~1 mm/Jahr)' },
+      { label: 'Platz 3', val: 'Aswan/Oberägypten (~2,5 mm/Jahr)' },
+      { label: 'Platz 4', val: 'Al Kufra, Libyen (~0,8 mm/Jahr)' },
+      { label: 'Platz 5', val: 'Luxor, Ägypten (~1,5 mm/Jahr)' }
+    ],
+    a: 'Antarktis Dry Valleys, Atacama, Aswan, Al Kufra, Luxor.',
+    cat: 'Geografie'
+  },
+  {
+    type: 'top5',
+    q: 'Welche 5 Länder haben die längste (ununterbrochen schriftlich dokumentierte) Geschichte? (Kontinuierliche Zivilisationen mit erhaltenen Aufzeichnungen, Quelle: Encyclopaedia Britannica)',
+    items: [
+      { label: 'Platz 1', val: 'China (seit ca. 1600 v. Chr. schriftlich)' },
+      { label: 'Platz 2', val: 'Ägypten (seit ca. 3100 v. Chr. schriftlich)' },
+      { label: 'Platz 3', val: 'Griechenland (seit ca. 1450 v. Chr. Linear B)' },
+      { label: 'Platz 4', val: 'Irak/Mesopotamien (Keilschrift seit 3200 v. Chr.)' },
+      { label: 'Platz 5', val: 'Indien (seit ca. 2600 v. Chr. Indus-Schrift)' }
+    ],
+    a: 'China, Ägypten, Griechenland, Irak, Indien.',
+    cat: 'Geschichte'
+  },
+  {
+    type: 'top5',
+    q: 'Was sind die 5 teuersten Gemälde, die jemals auf Auktionen (oder Privatverkäufen) versteigert wurden? (Stand 2023, Inflation nicht bereinigt, Quelle: Christie’s / Sotheby’s)',
+    items: [
+      { label: 'Platz 1', val: 'Salvator Mundi (Leonardo da Vinci, 450 Mio. USD)' },
+      { label: 'Platz 2', val: 'Interchange (de Kooning, 300 Mio. USD/Privat)' },
+      { label: 'Platz 3', val: 'Die Kartoffelesser (van Gogh, 300 Mio. USD/Privat)' },
+      { label: 'Platz 4', val: 'Les Femmes d’Alger (Picasso, 179 Mio. USD)' },
+      { label: 'Platz 5', val: 'Nu couché (Modigliani, 170 Mio. USD)' }
+    ],
+    a: 'Salvator Mundi, Interchange, Kartoffelesser, Femmes d‘Alger, Nu couché.',
+    cat: 'Kultur'
+  },
+  {
+    type: 'top5',
+    q: 'Welche 5 heute noch gesprochenen Sprachen haben das älteste Schrift- bzw. Textsystem? (Aktuell noch gesprochene Sprachfamilien mit kontinuierlicher Schriftdokumentation)',
+    items: [
+      { label: 'Platz 1', val: 'Griechisch (seit ca. 1450 v. Chr. Linear B)' },
+      { label: 'Platz 2', val: 'Chinesisch/Mandarin (seit ca. 1250 v. Chr.)' },
+      { label: 'Platz 3', val: 'Hebräisch (seit ca. 1000 v. Chr.)' },
+      { label: 'Platz 4', val: 'Tamil (seit ca. 300 v. Chr.)' },
+      { label: 'Platz 5', val: 'Persisch (seit ca. 600 v. Chr.)' }
+    ],
+    a: 'Griechisch, Chinesisch, Hebräisch, Tamil, Persisch.',
+        cat: 'Kultur'
+      },
+      { type: 'multiple', q: 'Welche chemische Elementgruppe macht den grössten Massenanteil (Gewicht) aus, aus dem der Erdkern besteht?', options: ['Eisen & Nickel', 'Silizium & Magnesium', 'Kohlenstoff & Schwefel', 'Aluminium & Kupfer'], correctIndex: 0, a: 'Der Erdkern besteht schätzungsweise aus ca. 90% Eisen und ca. 10% Nickel (Quelle: Max-Planck-Institut für Chemie).', cat: 'Wissenschaft' },
   { type: 'multiple', q: 'Wie hoch ist die Fluchtgeschwindigkeit an der Erdoberfläche? (Die Mindestgeschwindigkeit, um die Gravitationskraft der Erde ohne weiteren Antrieb zu verlassen)', options: ['7,9 km/s', '11,2 km/s', '16,7 km/s', '29,8 km/s'], correctIndex: 1, a: 'Die zweite kosmische Geschwindigkeit bzw. Fluchtgeschwindigkeit der Erde beträgt ca. 11,2 Kilometer pro Sekunde (ca. 40.320 km/h).', cat: 'Wissenschaft' },
   { type: 'multiple', q: 'Welches Säugetier hat die kürzeste Schwangerschaftsdauer im gesamten bekannten Tierreich?', options: ['Feldmaus (19 Tage)', 'Opossum (12 Tage)', 'Goldhamster (16 Tage)', 'Langnasenbeutler (12 Tage)'], correctIndex: 1, a: 'Die nordamerikanische Opossum-Art bringt ihre Jungtiere bereits nach 11 bis 12 Tagen Tragezeit zur Welt.', cat: 'Natur' },
   { type: 'multiple', q: 'Welche Stadt war die erste in der Geschichte der Menschheit, die die Marke von 1 Million Einwohnern überschritten hat?', options: ['Peking', 'Alexandria', 'Rom', 'London'], correctIndex: 2, a: 'Das antike Rom überschritt die Millionengrenze schätzungsweise im 1. Jahrhundert v. Chr. unter Augustus.', cat: 'Geschichte' },
@@ -965,10 +1214,9 @@ function showQuestion(index) {
     let listHtml = '';
     q.items.forEach((item, idx) => {
       listHtml += `
-        <div class="top5-item hidden-item" id="top5-${idx}" onclick="revealTop5Item(${idx})">
+        <div class="top5-item revealed-item">
           <span class="rank">${idx + 1}</span>
-          <span class="value" id="top5-val-${idx}">${item.val}</span>
-          <span class="lock-icon" id="top5-lock-${idx}">🔒</span>
+          <span class="value">${item.val}</span>
         </div>
       `;
     });
@@ -976,9 +1224,9 @@ function showQuestion(index) {
       <div class="top5-list">
         ${listHtml}
       </div>
-      <div class="tap-hint" id="tap-hint">👆 Jedes Item einzeln antippen zum Aufdecken</div>
     `;
-  }
+    // Top5 ist per se "aufgedeckt"
+    isRevealed = true;
 }
 
 // Suchen der passenden UI-Elemente zum Aufdecken der Schätzfrage
