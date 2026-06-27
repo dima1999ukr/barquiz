@@ -174,6 +174,44 @@
       margin-top: 6px;
     }
 
+    /* ---- SWIPE BUTTONS (Fallback) ---- */
+    .swipe-btns {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .swipe-btns button {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 70px;
+      border: none;
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.15);
+      font-size: 2rem;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .swipe-btns button:active,
+    .swipe-btns button:hover {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.5);
+    }
+    .swipe-btns .btn-prev {
+      left: 0;
+      border-radius: 20px 0 0 20px;
+    }
+    .swipe-btns .btn-next-card {
+      right: 0;
+      border-radius: 0 20px 20px 0;
+    }
+
     /* ---- CONTROLS ---- */
     .controls {
       display: flex;
@@ -292,6 +330,10 @@
         <span class="answer-text" id="answer-text">Damaskus, Syrien (seit ca. 3000 v. Chr. ununterbrochen bewohnt)</span>
       </div>
       <div class="tap-hint" id="tap-hint">👆 Tippen zum Aufdecken</div>
+    </div>
+    <div class="swipe-btns">
+      <button class="btn-prev" id="card-prev" aria-label="Vorherige">‹</button>
+      <button class="btn-next-card" id="card-next" aria-label="Nächste">›</button>
     </div>
   </div>
 
@@ -424,6 +466,20 @@ document.getElementById('btn-shuffle').addEventListener('click', () => {
   showToast('🎲 Neu gemischt!');
 });
 
+// Card-Navi-Pfeile (Fallback für Touch)
+document.getElementById('card-next').addEventListener('click', () => {
+  if (!isRevealed) { revealAnswer(); return; }
+  scoreRight++;
+  document.getElementById('score-right').textContent = scoreRight;
+  nextQuestion();
+});
+document.getElementById('card-prev').addEventListener('click', () => {
+  if (!isRevealed) { revealAnswer(); return; }
+  scoreWrong++;
+  document.getElementById('score-wrong').textContent = scoreWrong;
+  nextQuestion();
+});
+
 // ============================================================
 // SWIPE-GESTE (via Pointer Events — funktioniert auf iOS PWA)
 // ============================================================
@@ -465,11 +521,12 @@ document.getElementById('btn-shuffle').addEventListener('click', () => {
   function finishSwipe() {
     if (!swiping) return;
     swiping = false;
-    card.style.transform = '';
-    card.style.opacity = '';
 
     if (Math.abs(dx) < 80) {
-      card.classList.remove('swiping'); // Zurückschnappen
+      // Zurückschnappen
+      card.classList.remove('swiping');
+      card.style.transform = '';
+      card.style.opacity = '';
       return;
     }
 
@@ -478,8 +535,10 @@ document.getElementById('btn-shuffle').addEventListener('click', () => {
     // Antwort aufdecken falls nötig
     if (!isRevealed) revealAnswer();
 
-    // Slide-out mit CSS-Transition
+    // Transition aktivieren und zur Zielposition animieren
     card.classList.remove('swiping');
+    // Force Reflow (wichtig für Safari!)
+    void card.offsetHeight;
     card.style.transform = dir === 'right'
       ? 'translateX(120%) rotate(8deg)'
       : 'translateX(-120%) rotate(-8deg)';
