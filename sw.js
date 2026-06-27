@@ -1,4 +1,4 @@
-const CACHE_NAME = 'barquiz-v2';
+const CACHE_NAME = 'barquiz-v' + new Date().getTime(); // Jedes Mal ein komplett neuer Cache-Name!
 const ASSETS = [
   'index.html',
   'manifest.json',

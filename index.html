@@ -488,6 +488,9 @@ document.getElementById('card-prev').addEventListener('click', () => {
   let startX = 0, dx = 0, swiping = false;
 
   card.addEventListener('pointerdown', (e) => {
+    // Falls ein Button oder das Antwortfeld geklickt wurde, Geste ignorieren!
+    if (e.target.closest('button') || e.target.closest('#answer-box')) return;
+
     // Nur primären Finger/Linksklick akzeptieren
     if (e.button !== 0) return;
     startX = e.clientX;
@@ -571,7 +574,7 @@ document.getElementById('card-prev').addEventListener('click', () => {
         card.style.opacity = '';
       });
     }, 300);
-  });
+  }
 })();
 
 // ============================================================
@@ -600,9 +603,20 @@ document.getElementById('install-close').addEventListener('click', () => {
   localStorage.setItem('barquiz-install-dismissed', '1');
 });
 
-// SERVICE WORKER (PWA OFFLINE)
+// SERVICE WORKER (PWA OFFLINE + SOFORT-UPDATE CHECK)
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.register('sw.js').then((reg) => {
+    // Falls ein Update gefunden wird, Seite automatisch neu laden!
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          showToast('🔄 Update wird geladen...');
+          setTimeout(() => window.location.reload(), 1000);
+        }
+      });
+    });
+  });
 }
 
 // ============================================================
