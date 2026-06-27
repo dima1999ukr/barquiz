@@ -1050,10 +1050,20 @@ function revealTop5Item(idx) {
 function nextQuestion() {
   currentIndex++;
   if (currentIndex >= shuffled.length) {
-    showToast('🎉 Alle 50 Fragen gelöst! Mische neu...');
+    showToast('🎉 Alle 65 Fragen gelöst! Mische neu...');
     resetShuffle();
   }
   showQuestion(currentIndex);
+}
+
+// Vorherige Frage (für linken Pfeil)
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showQuestion(currentIndex);
+  } else {
+    showToast('🎲 Schon bei der ersten Frage!');
+  }
 }
 
 // Toast-System
@@ -1107,28 +1117,12 @@ document.getElementById('btn-shuffle').addEventListener('click', () => {
   showToast('🎲 Neu gemischt!');
 });
 
-// Card-Navi-Pfeile
+// Card-Navi-Pfeile (nur Navigation, KEIN Score)
 document.getElementById('card-next').addEventListener('click', () => {
-  const current = shuffled[currentIndex];
-  if (current.type === 'estimate' && !isRevealed) { revealAnswer(); return; }
-  if (current.type === 'multiple' && !hasSelectedMC) { showToast('👉 Wählt eine Antwort!'); return; }
-  
-  if (current.type !== 'multiple') {
-    scoreRight++;
-    document.getElementById('score-right').textContent = scoreRight;
-  }
   nextQuestion();
 });
 document.getElementById('card-prev').addEventListener('click', () => {
-  const current = shuffled[currentIndex];
-  if (current.type === 'estimate' && !isRevealed) { revealAnswer(); return; }
-  if (current.type === 'multiple' && !hasSelectedMC) { showToast('👉 Wählt eine Antwort!'); return; }
-
-  if (current.type !== 'multiple') {
-    scoreWrong++;
-    document.getElementById('score-wrong').textContent = scoreWrong;
-  }
-  nextQuestion();
+  prevQuestion();
 });
 
 // ============================================================
@@ -1178,14 +1172,6 @@ document.getElementById('card-prev').addEventListener('click', () => {
     const dir = dx > 0 ? 'right' : 'left';
     const current = shuffled[currentIndex];
 
-    if (current.type === 'multiple' && !hasSelectedMC) {
-      showToast('👉 Wähle erst eine Antwort!');
-      card.classList.remove('swiping');
-      card.style.transform = '';
-      card.style.opacity = '';
-      return;
-    }
-
     // Antwort aufdecken falls nötig
     if (current.type === 'estimate' && !isRevealed) revealAnswer();
 
@@ -1197,18 +1183,7 @@ document.getElementById('card-prev').addEventListener('click', () => {
       : 'translateX(-120%) rotate(-8deg)';
     card.style.opacity = '0';
 
-    // Score (Nur für Nicht-Multiple-Choice, da MC sich selbst bewertet)
-    if (current.type !== 'multiple') {
-      if (dir === 'right') {
-        scoreRight++;
-        document.getElementById('score-right').textContent = scoreRight;
-      } else {
-        scoreWrong++;
-        document.getElementById('score-wrong').textContent = scoreWrong;
-      }
-    }
-
-    // Nächste Frage
+        // Nächste Frage
     setTimeout(() => {
       nextQuestion();
       card.classList.add('swiping');
