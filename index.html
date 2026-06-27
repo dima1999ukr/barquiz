@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>BarQuiz</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ---- HEADER ---- */
+    header {
+      padding: 24px 20px 12px;
+      text-align: center;
+      position: relative;
+    }
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header .sub {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 2px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .score-row {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+    }
+    .score-row span {
+      color: #aaa;
+    }
+    .score-row strong {
+      color: #ffd200;
+      font-weight: 700;
+    }
+
+    /* ---- MAIN CARD ---- */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 16px 0;
+    }
+
+    .card {
+      background: #16213e;
+      border-radius: 20px;
+      padding: 28px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #f7971e, #ffd200);
+    }
+
+    .category-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      background: rgba(247, 151, 30, 0.15);
+      color: #f7971e;
+      padding: 4px 12px;
+      border-radius: 20px;
+      align-self: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .question-number {
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 1.3rem;
+      line-height: 1.5;
+      font-weight: 600;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    /* ---- ANSWER REVEAL ---- */
+    .answer-section {
+      margin-top: auto;
+      text-align: center;
+    }
+
+    .answer-box {
+      background: #0f3460;
+      border-radius: 14px;
+      padding: 18px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffd200;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      border: 1px dashed rgba(255, 210, 0, 0.2);
+    }
+    .answer-box.hidden {
+      color: transparent;
+      background: #0f3460;
+      border-color: rgba(255,255,255,0.08);
+    }
+    .answer-box.hidden .answer-text {
+      filter: blur(8px);
+      transition: filter 0.4s;
+    }
+    .answer-box .answer-text {
+      filter: blur(0);
+      transition: filter 0.3s;
+    }
+    .answer-box.revealed {
+      border-style: solid;
+      border-color: #ffd200;
+      background: #1a2d50;
+    }
+    .tap-hint {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 6px;
+    }
+
+    /* ---- CONTROLS ---- */
+    .controls {
+      display: flex;
+      gap: 10px;
+      padding: 16px 0 24px;
+    }
+    .controls button {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .controls button:active {
+      transform: scale(0.96);
+    }
+
+    .btn-next {
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      color: #1a1a2e;
+    }
+    .btn-skip {
+      background: rgba(255,255,255,0.08);
+      color: #888;
+    }
+    .btn-shuffle {
+      background: rgba(255,255,255,0.08);
+      color: #888;
+      flex: 0.5;
+      font-size: 1.2rem;
+    }
+
+    /* ---- TOAST ---- */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #2d2d44;
+      color: #eee;
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ---- INSTALL BANNER ---- */
+    .install-banner {
+      display: none;
+      background: #0f3460;
+      padding: 12px 16px;
+      margin: 0 16px 12px;
+      border-radius: 12px;
+      align-items: center;
+      gap: 10px;
+    }
+    .install-banner.show {
+      display: flex;
+    }
+    .install-banner p {
+      flex: 1;
+      font-size: 0.8rem;
+      color: #ccc;
+    }
+    .install-banner button {
+      background: #ffd200;
+      color: #1a1a2e;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .install-banner .close-btn {
+      background: none;
+      color: #888;
+      padding: 4px 8px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🍺 BarQuiz</h1>
+  <div class="sub">Schätzfragen für die Runde</div>
+  <div class="score-row">
+    <span>Richtig: <strong id="score-right">0</strong></span>
+    <span>Falsch: <strong id="score-wrong">0</strong></span>
+    <span>Frage <strong id="q-counter">1/15</strong></span>
+  </div>
+</header>
+
+<main>
+  <div class="card" id="card">
+    <span class="category-badge" id="category-badge">Allgemein</span>
+    <div class="question-number" id="q-num">Frage 1</div>
+    <div class="question-text" id="question-text">
+      Wie heißt die längste noch erhaltene antike Stadt der Welt?
+    </div>
+    <div class="answer-section">
+      <div class="answer-box hidden" id="answer-box">
+        <span class="answer-text" id="answer-text">Damaskus, Syrien (seit ca. 3000 v. Chr. ununterbrochen bewohnt)</span>
+      </div>
+      <div class="tap-hint" id="tap-hint">👆 Tippen zum Aufdecken</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-skip" id="btn-wrong">✗ Falsch</button>
+    <button class="btn-next" id="btn-next">✓ Richtig →</button>
+    <button class="btn-shuffle" id="btn-shuffle">🎲</button>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="install-banner" id="install-banner">
+  <p>📱 Installiere BarQuiz für den schnellen Zugriff</p>
+  <button id="install-btn">Installieren</button>
+  <button class="close-btn" id="install-close">✕</button>
+</div>
+
+<script>
+// ============================================================
+// FRAGEN-POOL
+// ============================================================
+const QUESTIONS = [
+  { q: 'Was sind die 5 meistgespielten Sportarten weltweit?',           a: '1. Fußball, 2. Basketball, 3. Tennis, 4. Cricket, 5. Hockey (Feld)',                                        cat: 'Sport' },
+  { q: 'Welche olympischen Spiele gibt es seit der ersten Austragung?', a: 'Sommer-OS (1896 Athen), Winter-OS (1924 Chamonix), Jugend-Sommer-OS (2010 Singapur), Jugend-Winter-OS (2012 Innsbruck)', cat: 'Sport' },
+  { q: 'Wie alt ist der älteste noch lebende Baum?',                    a: 'Ca. 4.856 Jahre — eine Great Basin Bristlecone Pine namens Methuselah in Kalifornien, USA',                cat: 'Natur' },
+  { q: 'Wie viele Länder gibt es auf der Erde?',                        a: '195 (193 UN-Mitglieder + Vatikanstadt + Palästina)',                                                         cat: 'Geografie' },
+  { q: 'Wie tief ist der tiefste Punkt der Erde?',                      a: '11.034 m — Marianengraben im Pazifik (Challenger Deep)',                                                    cat: 'Natur' },
+  { q: 'Wie viele Menschen leben aktuell auf der Erde?',                a: 'Ca. 8,1 Milliarden (2025)',                                                                                  cat: 'Gesellschaft' },
+  { q: 'Wie viele Sprachen werden weltweit gesprochen?',                a: 'Ca. 7.100–7.200 lebende Sprachen',                                                                          cat: 'Kultur' },
+  { q: 'Wie lang ist die Chinesische Mauer (alle Abschnitte)?',         a: '21.196 km',                                                                                                 cat: 'Geschichte' },
+  { q: 'Wie viele Monde hat der Jupiter?',                              a: '95 bestätigte Monde (Stand 2024)',                                                                          cat: 'Wissenschaft' },
+  { q: 'In welchem Jahr wurde das erste Bier gebraut?',                 a: 'Ca. 4000 v. Chr. (Sumerer, Mesopotamien)',                                                                 cat: 'Geschichte' },
+  { q: 'Wie viele Zellen hat der menschliche Körper?',                  a: 'Ca. 37,2 Billionen (3,72 × 10¹³)',                                                                          cat: 'Wissenschaft' },
+  { q: 'Wie hoch ist der Mount Everest?',                               a: '8.848,86 m (Stand 2020, China-Nepal-Vermessung)',                                                           cat: 'Geografie' },
+  { q: 'Wie viele Tage braucht die ISS für einen Erdumlauf?',           a: 'Ca. 92 Minuten — etwa 15,5 Umläufe pro Tag',                                                               cat: 'Wissenschaft' },
+  { q: 'Wie viele Tassen Kaffee werden täglich weltweit getrunken?',    a: 'Ca. 2,25 Milliarden Tassen pro Tag',                                                                        cat: 'Gesellschaft' },
+  { q: 'Wie viele Buchseiten hat der durchschnittliche Mensch gelesen?',a: 'Ca. 1–3 Bücher pro Jahr statistisch, aber 0 Bücher liest ca. 30% der Weltbevölkerung jährlich',              cat: 'Gesellschaft' },
+  { q: 'Welches Tier ist das schnellste an Land?',                      a: 'Gepard (bis 120 km/h über kurze Distanzen)',                                                                cat: 'Natur' },
+  { q: 'Wie tief kann ein Pottwal tauchen?',                            a: 'Über 2.000 Meter tief (Rekord: ca. 2.992 m)',                                                               cat: 'Natur' },
+  { q: 'Wie viele Menschen waren jemals auf dem Mond?',                 a: '12 (alle zwischen 1969 und 1972 im Apollo-Programm)',                                                       cat: 'Wissenschaft' },
+  { q: 'Wie stark war das stärkste je gemessene Erdbeben?',             a: 'Magnitude 9,5 — Valdivia, Chile (1960)',                                                                   cat: 'Natur' },
+  { q: 'Wie viele Kilometer ist das Licht in einer Stunde unterwegs?',  a: 'Ca. 1,08 Milliarden km (299.792 km/s × 3.600)',                                                             cat: 'Wissenschaft' },
+  { q: 'Wie viele Biersorten gibt es weltweit?',                        a: 'Schätzungsweise über 20.000 (allein über 10.000 in Deutschland)',                                           cat: 'Kultur' },
+  { q: 'Welche Stadt hat die meisten Einwohner der Welt?',              a: 'Tokio, Japan (ca. 37 Mio. im Ballungsraum)',                                                                cat: 'Geografie' },
+  { q: 'Wie lange dauerte der längste Krieg der Geschichte?',           a: '335 Jahre — die Scilly-Inseln vs. die Niederlande (1651–1986, kein einziger Schuss)',                     cat: 'Geschichte' },
+  { q: 'Wie viele Atemzüge macht ein Mensch am Tag?',                   a: 'Ca. 20.000–25.000 (ca. 12–16 pro Minute)',                                                                 cat: 'Wissenschaft' },
+  { q: 'Was ist das teuerste Gewürz der Welt?',                         a: 'Safran (ca. 10.000–30.000 €/kg je nach Qualität)',                                                         cat: 'Kultur' },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentIndex = 0;
+let shuffled = [];
+let scoreRight = 0;
+let scoreWrong = 0;
+let isRevealed = false;
+let toastTimer = null;
+
+// Shuffle on init
+function shuffleArray(arr) { for (let i = arr.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function resetShuffle() { shuffled = shuffleArray([...QUESTIONS]); currentIndex = 0; }
+
+function showQuestion(index) {
+  const q = shuffled[index];
+  document.getElementById('category-badge').textContent = q.cat;
+  document.getElementById('q-num').textContent = `Frage ${index+1} von ${shuffled.length}`;
+  document.getElementById('question-text').textContent = q.q;
+  document.getElementById('answer-text').textContent = q.a;
+
+  const box = document.getElementById('answer-box');
+  box.classList.add('hidden');
+  box.classList.remove('revealed');
+  document.getElementById('tap-hint').textContent = '👆 Tippen zum Aufdecken';
+  isRevealed = false;
+
+  document.getElementById('q-counter').textContent = `${index+1}/${shuffled.length}`;
+}
+
+function revealAnswer() {
+  const box = document.getElementById('answer-box');
+  if (!box.classList.contains('hidden')) return;
+  box.classList.remove('hidden');
+  box.classList.add('revealed');
+  document.getElementById('tap-hint').textContent = '';
+  isRevealed = true;
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= shuffled.length) {
+    showToast('🎉 Alle Fragen durch! Neu gemischt.');
+    resetShuffle();
+  }
+  showQuestion(currentIndex);
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+document.getElementById('answer-box').addEventListener('click', revealAnswer);
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  if (!isRevealed) { revealAnswer(); return; }
+  scoreRight++;
+  document.getElementById('score-right').textContent = scoreRight;
+  nextQuestion();
+});
+
+document.getElementById('btn-wrong').addEventListener('click', () => {
+  if (!isRevealed) { revealAnswer(); return; }
+  scoreWrong++;
+  document.getElementById('score-wrong').textContent = scoreWrong;
+  nextQuestion();
+});
+
+document.getElementById('btn-shuffle').addEventListener('click', () => {
+  resetShuffle();
+  showQuestion(0);
+  showToast('🎲 Neu gemischt!');
+});
+
+// ============================================================
+// PWA INSTALL
+// ============================================================
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!localStorage.getItem('barquiz-install-dismissed')) {
+    document.getElementById('install-banner').classList.add('show');
+  }
+});
+
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const result = await deferredPrompt.userChoice;
+  if (result.outcome === 'accepted') showToast('✅ Installiert! Prost! 🍺');
+  deferredPrompt = null;
+  document.getElementById('install-banner').classList.remove('show');
+});
+
+document.getElementById('install-close').addEventListener('click', () => {
+  document.getElementById('install-banner').classList.remove('show');
+  localStorage.setItem('barquiz-install-dismissed', '1');
+});
+
+// SERVICE WORKER (PWA OFFLINE)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
+// ============================================================
+// START
+// ============================================================
+resetShuffle();
+showQuestion(0);
+</script>
+</body>
+</html>
