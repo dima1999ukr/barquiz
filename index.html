@@ -48,15 +48,16 @@
       text-transform: uppercase;
     }
     .ver-badge {
-      font-size: 0.65rem;
-      color: #1a1a2e;
-      background: #ffd200;
-      padding: 1px 8px;
-      border-radius: 20px;
-      vertical-align: middle;
-      margin-left: 6px;
-      font-weight: 700;
-    }
+          font-size: 0.75rem;
+          color: #000;
+          background: #ffd200;
+          padding: 2px 10px;
+          border-radius: 20px;
+          vertical-align: middle;
+          margin-left: 6px;
+          font-weight: 700;
+          line-height: 1.4;
+        }
 
     .score-row {
       display: flex;
@@ -442,10 +443,11 @@
   <h1>🍺 BarQuiz <span class="ver-badge">v1.3.0</span></h1>
   <div class="sub">Schätzfragen für die Runde</div>
   <div class="score-row">
-    <span>Richtig: <strong id="score-right">0</strong></span>
-    <span>Falsch: <strong id="score-wrong">0</strong></span>
-    <span>Frage <strong id="q-counter">1/50</strong></span>
-  </div>
+      <span>Richtig: <strong id="score-right">0</strong></span>
+      <span>Falsch: <strong id="score-wrong">0</strong></span>
+      <span>Frage <strong id="q-counter">1/50</strong></span>
+      <span>🧠 <strong id="q-used">0</strong>/<strong id="q-available">65</strong></span>
+    </div>
 </header>
 
 <main>
@@ -936,6 +938,16 @@ function shuffleArray(arr) {
 function resetShuffle() {
   shuffled = shuffleArray([...QUESTIONS]);
   currentIndex = 0;
+  usedIndices.clear();
+  updateUsedCounter();
+}
+
+// Aktualisiert den 🧠-Counter für gemerkte/verfügbare Fragen
+function updateUsedCounter() {
+  const used = usedIndices.size;
+  const total = shuffled.length;
+  document.getElementById('q-used').textContent = used;
+  document.getElementById('q-available').textContent = total - used;
 }
 
 // Rendert die Frage und passt das Spiel-Interface an
@@ -947,6 +959,7 @@ function showQuestion(index) {
   document.getElementById('q-num').textContent = `Frage ${index + 1} von ${shuffled.length}`;
   document.getElementById('question-text').textContent = q.q;
   document.getElementById('q-counter').textContent = `${index + 1}/${shuffled.length}`;
+  updateUsedCounter();
 
   const container = document.getElementById('game-content');
   container.innerHTML = ''; // Box leeren
@@ -1155,6 +1168,7 @@ document.getElementById('btn-shuffle').addEventListener('click', () => {
 // "hatten wir schon" — aktuelle Frage merken
 document.getElementById('btn-used').addEventListener('click', () => {
   usedIndices.add(currentIndex);
+  updateUsedCounter();
   showToast('🧠 Frage ' + (currentIndex+1) + ' gemerkt — kommt nicht mehr dran');
   nextQuestion();
 });
@@ -1164,6 +1178,7 @@ document.getElementById('btn-dementia').addEventListener('click', () => {
   const count = usedIndices.size;
   if (count === 0) { showToast('💊 Keine gesperrten Fragen!'); return; }
   usedIndices.clear();
+  updateUsedCounter();
   showToast('💊 Demenz! Alle ' + count + ' Fragen wieder im Pool!');
 });
 
