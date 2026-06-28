@@ -47,6 +47,16 @@
       letter-spacing: 2px;
       text-transform: uppercase;
     }
+    .ver-badge {
+      font-size: 0.65rem;
+      color: #ffd200;
+      background: rgba(255,210,0,0.12);
+      padding: 2px 8px;
+      border-radius: 20px;
+      vertical-align: middle;
+      margin-left: 4px;
+      font-weight: 600;
+    }
 
     .score-row {
       display: flex;
@@ -429,7 +439,7 @@
 <body>
 
 <header>
-  <h1>🍺 BarQuiz <span style="font-size: 0.8rem; vertical-align: middle; opacity: 0.5;">v1.3.0</span></h1>
+  <h1>🍺 BarQuiz <span class="ver-badge">v1.3.0</span></h1>
   <div class="sub">Schätzfragen für die Runde</div>
   <div class="score-row">
     <span>Richtig: <strong id="score-right">0</strong></span>
