@@ -321,13 +321,15 @@
     /* ---- CONTROLS ---- */
     .controls {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
-      padding: 16px 0 24px;
+      padding: 12px 0 24px;
       padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
     }
     .controls button {
       flex: 1;
-      padding: 14px;
+      min-width: 70px;
+      padding: 14px 8px;
       border: none;
       border-radius: 14px;
       font-size: 1rem;
@@ -345,6 +347,19 @@
     .btn-skip {
       background: rgba(255,255,255,0.08);
       color: #888;
+    }
+    .btn-used {
+      background: rgba(100,100,100,0.15);
+      color: #777;
+      flex: 0.5;
+      font-size: 0.7rem;
+    }
+    .btn-dementia {
+      background: rgba(255,71,87,0.08);
+      color: #ff4757;
+      border: 1px dashed rgba(255,71,87,0.2) !important;
+      flex: 0.5;
+      font-size: 0.65rem;
     }
     .btn-shuffle {
       background: rgba(255,255,255,0.08);
@@ -443,6 +458,8 @@
   <div class="controls">
     <button class="btn-skip" id="btn-wrong">✗ Falsch</button>
     <button class="btn-next" id="btn-next">✓ Richtig →</button>
+    <button class="btn-used" id="btn-used">🧠 hatten<br>wir schon</button>
+    <button class="btn-dementia" id="btn-dementia">💊 Demenz</button>
     <button class="btn-shuffle" id="btn-shuffle">🎲</button>
   </div>
 </main>
@@ -1137,9 +1154,9 @@ const QUESTIONS = [
 
 // ============================================================
 // GAME STATE
-// ============================================================
 let currentIndex = 0;
 let shuffled = [];
+let usedIndices = new Set(); // Indizes der Fragen die "hatten wir schon" sind
 let scoreRight = 0;
 let scoreWrong = 0;
 let isRevealed = false; // Für Schätzen/Top 5
@@ -1294,12 +1311,19 @@ function revealTop5Item(idx) {
   }
 }
 
-// Nächste Frage Logik
+// Nächste Frage (überspringt "hatten wir schon"-Fragen)
 function nextQuestion() {
   currentIndex++;
+  // Überspringe als "hatten wir schon" markierte Fragen
+  let safety = 0;
+  while (currentIndex < shuffled.length && usedIndices.has(currentIndex) && safety < 200) {
+    currentIndex++;
+    safety++;
+  }
   if (currentIndex >= shuffled.length) {
-    showToast('🎉 Alle 65 Fragen gelöst! Mische neu...');
+    showToast('🎉 Alle Fragen durch! Mische neu...');
     resetShuffle();
+    usedIndices.clear();
   }
   showQuestion(currentIndex);
 }
@@ -1363,6 +1387,21 @@ document.getElementById('btn-shuffle').addEventListener('click', () => {
   resetShuffle();
   showQuestion(0);
   showToast('🎲 Neu gemischt!');
+});
+
+// "hatten wir schon" — markiert aktuelle Frage für Ausschluss
+document.getElementById('btn-used').addEventListener('click', () => {
+  usedIndices.add(currentIndex);
+  showToast(`🧠 Frage ${currentIndex+1} gemerkt — kommt nicht mehr dran`);
+  nextQuestion();
+});
+
+// "Demenz" — alle gesperrten Fragen wieder freigeben
+document.getElementById('btn-dementia').addEventListener('click', () => {
+  const count = usedIndices.size;
+  if (count === 0) { showToast('💊 Keine gesperrten Fragen!'); return; }
+  usedIndices.clear();
+  showToast(`💊 Demenz! Alle ${count} Fragen wieder im Pool!`);
 });
 
 // Card-Navi-Pfeile (nur Navigation, KEIN Score)
