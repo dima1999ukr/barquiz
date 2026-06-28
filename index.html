@@ -950,7 +950,6 @@ function resetShuffle() {
 function updateUsedCounter() {
   const used = usedIndices.size;
   const total = shuffled.length;
-  const avail = total - used;
   document.getElementById('q-used').textContent = used;
   document.getElementById('q-available').textContent = total;
   document.getElementById('q-counter').textContent = `${currentIndex + 1}`;
