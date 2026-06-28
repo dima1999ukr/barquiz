@@ -953,8 +953,8 @@ function updateUsedCounter() {
   const avail = total - used;
   document.getElementById('q-used').textContent = used;
   document.getElementById('q-available').textContent = total;
-  document.getElementById('q-counter').textContent = `${currentIndex + 1}/${avail}`;
-  document.getElementById('q-num').textContent = `Frage ${currentIndex + 1} von ${total}`;
+  document.getElementById('q-counter').textContent = `${currentIndex + 1}`;
+  document.getElementById('q-num').textContent = `Frage ${currentIndex + 1}`;
 }
 
 // Rendert die Frage und passt das Spiel-Interface an
